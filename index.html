@@ -4,258 +4,507 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
 <title>DSBTI | 数字灵魂采样</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;600&display=swap" rel="stylesheet">
 <style>
+:root {
+  --bg: #fafafa;
+  --fg: #1a1a1a;
+  --muted: #888;
+  --accent: #1a1a1a;
+  --border: rgba(0,0,0,0.08);
+  --card: #ffffff;
+  --glow: rgba(0,0,0,0.03);
+}
+
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
 }
+
 body, html {
   width: 100%;
   height: 100%;
-  background: #0a0a0a;
-  color: #e0e0e0;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  background: var(--bg);
+  color: var(--fg);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Noto Serif SC", serif;
   overflow: hidden;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
+
+/* 纹理背景 */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image: 
+    radial-gradient(circle at 20% 80%, rgba(0,0,0,0.015) 0%, transparent 50%),
+    radial-gradient(circle at 80% 20%, rgba(0,0,0,0.02) 0%, transparent 50%),
+    radial-gradient(circle at 50% 50%, rgba(0,0,0,0.01) 0%, transparent 70%);
+  pointer-events: none;
+  z-index: 0;
+}
+
 #app {
+  position: relative;
+  z-index: 1;
   width: 100%;
   height: 100%;
-  max-width: 600px;
+  max-width: 680px;
   margin: 0 auto;
-  padding: 60px 24px;
+  padding: 80px 40px;
   display: flex;
   flex-direction: column;
   opacity: 0;
-  animation: fadeIn 0.6s ease forwards;
+  animation: fadeIn 1s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
+
 @keyframes fadeIn {
   to { opacity: 1; }
 }
-.progress {
-  height: 2px;
-  background: #222;
-  border-radius: 99px;
-  overflow: hidden;
-  margin-bottom: 40px;
+
+/* 顶部标记 */
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 60px;
 }
+
+.brand {
+  font-size: 10px;
+  letter-spacing: 3px;
+  color: var(--muted);
+  text-transform: uppercase;
+}
+
+.progress-text {
+  font-size: 11px;
+  letter-spacing: 1px;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+
+/* 进度条 */
+.progress-wrap {
+  margin-bottom: 50px;
+}
+
+.progress {
+  height: 1px;
+  background: var(--border);
+  position: relative;
+  overflow: hidden;
+}
+
 .bar {
   height: 100%;
   width: 0%;
-  background: linear-gradient(90deg, #3b82f6, #8b5cf6);
-  transition: width 0.4s ease;
+  background: var(--fg);
+  transition: width 0.6s cubic-bezier(0.16, 1, 0.3, 1);
 }
-.phase {
-  font-size: 11px;
-  color: #666;
-  letter-spacing: 2px;
-  margin-bottom: 12px;
-  text-transform: uppercase;
+
+.progress-glow {
+  position: absolute;
+  right: 0;
+  top: -2px;
+  width: 6px;
+  height: 5px;
+  background: var(--fg);
+  border-radius: 50%;
+  filter: blur(3px);
+  opacity: 0;
+  transition: opacity 0.3s;
 }
-.question {
-  font-size: 18px;
-  line-height: 1.7;
-  font-weight: 400;
-  margin-bottom: 40px;
-  min-height: 5em;
+
+.bar:not(:empty) .progress-glow {
+  opacity: 1;
+}
+
+/* 问题区域 */
+.question-wrap {
+  flex: 1;
   display: flex;
-  align-items: center;
+  flex-direction: column;
+  justify-content: center;
 }
+
+.question {
+  font-size: 22px;
+  line-height: 1.8;
+  font-weight: 400;
+  font-family: "Noto Serif SC", serif;
+  letter-spacing: 0.02em;
+  margin-bottom: 60px;
+}
+
+/* 选项 */
 .options {
-  display: grid;
-  gap: 10px;
-  margin-top: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
 }
+
 .option {
-  padding: 16px 18px;
-  border: 1px solid #333;
-  border-radius: 10px;
+  padding: 20px 24px;
+  border: none;
+  border-radius: 0;
   background: transparent;
-  color: #e0e0e0;
-  font-size: 14px;
+  color: var(--fg);
+  font-size: 15px;
+  font-family: inherit;
   text-align: left;
   cursor: pointer;
-  transition: all 0.2s ease;
+  position: relative;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  letter-spacing: 0.01em;
 }
-.option:hover {
-  border-color: #3b82f6;
-  background: rgba(59, 130, 246, 0.1);
+
+.option::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 0;
+  height: 100%;
+  background: var(--fg);
+  transition: width 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
+
+.option span {
+  position: relative;
+  z-index: 1;
+  display: block;
+  padding-left: 20px;
+  border-left: 1px solid var(--border);
+  transition: all 0.3s;
+}
+
+.option:hover span {
+  border-color: var(--fg);
+  padding-left: 28px;
+}
+
 .option:active {
-  background: #3b82f6;
-  color: #fff;
-  border-color: #3b82f6;
+  transform: scale(0.98);
 }
+
+.option:active::before {
+  width: 100%;
+}
+
+.option:active span {
+  color: #fff;
+  border-color: transparent;
+}
+
 .start {
   text-align: center;
-  font-weight: 500;
-  border-color: #3b82f6;
-  background: rgba(59, 130, 246, 0.15);
+}
+
+.start span {
+  border: none;
+  padding: 0;
+  font-size: 13px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+
+.start:hover span {
+  padding: 0;
 }
 
 /* 结果页 */
 #result {
   position: fixed;
   inset: 0;
-  background: #0a0a0a;
-  padding: 50px 28px;
+  background: var(--bg);
+  z-index: 100;
   display: none;
   flex-direction: column;
   opacity: 0;
 }
+
 #result.show {
   display: flex;
-  animation: fadeIn 0.8s ease forwards;
+  animation: fadeIn 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
-.icon-wrap {
-  width: 100px;
-  height: 100px;
-  margin: 10px 0 28px;
-  border-radius: 20px;
+
+.result-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 60px 40px;
+  max-width: 680px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+/* 结果图标 */
+.icon-container {
+  position: relative;
+  margin-bottom: 50px;
+}
+
+.icon-ring {
+  width: 120px;
+  height: 120px;
+  border: 1px solid var(--border);
+  border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
+  position: relative;
 }
+
+.icon-ring::before {
+  content: '';
+  position: absolute;
+  inset: -20px;
+  border: 1px solid var(--border);
+  border-radius: 50%;
+  opacity: 0.5;
+}
+
+.icon-ring::after {
+  content: '';
+  position: absolute;
+  inset: -40px;
+  border: 1px solid var(--border);
+  border-radius: 50%;
+  opacity: 0.25;
+}
+
 .icon {
-  width: 60px;
-  height: 60px;
+  width: 50px;
+  height: 50px;
+  opacity: 0;
+  animation: iconFade 0.6s 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
-.type-tag {
-  font-size: 11px;
-  color: #666;
-  letter-spacing: 2px;
-  margin-bottom: 8px;
+
+@keyframes iconFade {
+  to { opacity: 1; }
+}
+
+/* 类型标签 */
+.type-label {
+  font-size: 10px;
+  letter-spacing: 4px;
+  color: var(--muted);
   text-transform: uppercase;
+  margin-bottom: 16px;
+  opacity: 0;
+  animation: slideUp 0.6s 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* 标题 */
 .title {
-  font-size: 42px;
-  font-weight: 700;
-  line-height: 1.1;
-  margin-bottom: 20px;
-  letter-spacing: -1px;
+  font-size: 36px;
+  font-weight: 600;
+  font-family: "Noto Serif SC", serif;
+  letter-spacing: 0.05em;
+  margin-bottom: 30px;
+  opacity: 0;
+  animation: slideUp 0.6s 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
+
+/* 描述 */
+.desc-container {
+  max-width: 400px;
+  text-align: center;
+  opacity: 0;
+  animation: slideUp 0.6s 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
 .desc {
   font-size: 15px;
-  line-height: 1.9;
-  color: #999;
-  padding-left: 16px;
-  border-left: 2px solid #3b82f6;
-}
-.logo {
-  margin-top: auto;
-  font-size: 12px;
-  font-weight: 500;
-  color: #444;
-  letter-spacing: 1px;
+  line-height: 2;
+  color: #555;
+  font-family: "Noto Serif SC", serif;
+  letter-spacing: 0.02em;
 }
 
-/* 分享按钮 */
-.share-box {
-  margin-top: 36px;
+/* 底部操作 */
+.result-footer {
+  padding: 40px;
   text-align: center;
-}
-.share-btn {
-  padding: 14px 32px;
-  background: linear-gradient(135deg, #3b82f6, #8b5cf6);
-  color: #fff;
-  border: none;
-  border-radius: 10px;
-  font-size: 14px;
-  font-weight: 500;
-  cursor: pointer;
-  transition: transform 0.2s, opacity 0.2s;
-}
-.share-btn:active {
-  transform: scale(0.98);
-  opacity: 0.9;
-}
-.retake-btn {
-  margin-top: 12px;
-  padding: 12px 32px;
-  background: transparent;
-  color: #666;
-  border: 1px solid #333;
-  border-radius: 10px;
-  font-size: 13px;
-  cursor: pointer;
+  opacity: 0;
+  animation: slideUp 0.6s 0.7s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
-/* 生成图片预览 */
+.share-btn {
+  padding: 18px 48px;
+  background: var(--fg);
+  color: var(--bg);
+  border: none;
+  font-size: 12px;
+  font-family: inherit;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.share-btn:hover {
+  background: #333;
+}
+
+.retake-btn {
+  display: block;
+  margin: 20px auto 0;
+  padding: 12px 24px;
+  background: transparent;
+  color: var(--muted);
+  border: none;
+  font-size: 11px;
+  font-family: inherit;
+  letter-spacing: 1px;
+  cursor: pointer;
+  transition: color 0.3s;
+}
+
+.retake-btn:hover {
+  color: var(--fg);
+}
+
+/* Logo */
+.logo {
+  font-size: 10px;
+  letter-spacing: 3px;
+  color: var(--muted);
+  text-transform: uppercase;
+  opacity: 0.5;
+}
+
+/* 图片预览弹窗 */
 #preview {
   position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0,0,0,0.85);
+  inset: 0;
+  background: rgba(0,0,0,0.9);
   display: none;
   justify-content: center;
   align-items: center;
-  z-index: 999;
+  z-index: 200;
   flex-direction: column;
-  padding: 20px;
+  padding: 40px;
 }
+
 #preview.show {
   display: flex;
 }
+
 #preview-img {
   max-width: 90%;
   max-height: 70vh;
-  border-radius: 12px;
-  box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+  box-shadow: 0 30px 80px rgba(0,0,0,0.5);
 }
+
 .preview-tip {
-  color: #888;
-  margin-top: 20px;
-  font-size: 13px;
+  color: #666;
+  margin-top: 30px;
+  font-size: 12px;
+  letter-spacing: 1px;
 }
+
 .close-preview {
-  margin-top: 16px;
-  padding: 10px 24px;
-  background: #222;
-  color: #aaa;
-  border: none;
-  border-radius: 8px;
-  font-size: 13px;
+  margin-top: 20px;
+  padding: 14px 36px;
+  background: transparent;
+  color: #888;
+  border: 1px solid #333;
+  font-size: 11px;
+  letter-spacing: 2px;
   cursor: pointer;
+  transition: all 0.3s;
+}
+
+.close-preview:hover {
+  color: #fff;
+  border-color: #666;
+}
+
+/* 响应式 */
+@media (max-width: 480px) {
+  #app, .result-content {
+    padding: 60px 28px;
+  }
+  .question {
+    font-size: 19px;
+  }
+  .title {
+    font-size: 28px;
+  }
+  .option {
+    padding: 18px 20px;
+  }
 }
 </style>
 </head>
 <body>
 
 <div id="app">
-  <div class="phase" id="phase">SIGNAL DETECTED</div>
-  <div class="progress"><div class="bar" id="bar"></div></div>
-  <div class="question" id="question">
-    你的数字信号已被捕获。<br>
-    28 个维度即将展开，锚定你的灵魂频率。
+  <div class="header">
+    <div class="brand">DSBTI</div>
+    <div class="progress-text" id="progress-text">——</div>
   </div>
-  <div class="options" id="options">
-    <button class="option start" onclick="start()">开始采样</button>
+  
+  <div class="progress-wrap">
+    <div class="progress">
+      <div class="bar" id="bar"></div>
+    </div>
+  </div>
+  
+  <div class="question-wrap">
+    <div class="question" id="question">
+      你的数字信号已被捕获。<br>
+      28 个维度即将展开。
+    </div>
+    <div class="options" id="options">
+      <button class="option start" onclick="start()"><span>启动采样</span></button>
+    </div>
   </div>
 </div>
 
 <div id="result">
-  <div class="icon-wrap" id="icon-wrap">
-    <svg class="icon" id="icon" viewBox="0 0 100 100" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></svg>
+  <div class="result-content">
+    <div class="icon-container">
+      <div class="icon-ring">
+        <svg class="icon" id="icon" viewBox="0 0 100 100" fill="none" stroke="#1a1a1a" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></svg>
+      </div>
+    </div>
+    <div class="type-label" id="type-tag"></div>
+    <div class="title" id="title"></div>
+    <div class="desc-container">
+      <div class="desc" id="desc"></div>
+    </div>
   </div>
-  <div class="type-tag" id="type-tag"></div>
-  <div class="title" id="title"></div>
-  <div class="desc" id="desc"></div>
-
-  <div class="share-box">
+  <div class="result-footer">
     <button class="share-btn" onclick="generateCard()">生成分享卡片</button>
-    <br>
-    <button class="retake-btn" onclick="location.reload()">重新测试</button>
+    <button class="retake-btn" onclick="location.reload()">重新采样</button>
+    <div class="logo" style="margin-top: 30px;">Digital Soul Baseline Test Interface</div>
   </div>
-
-  <div class="logo">DSBTI · Digital Soul Baseline Test Interface</div>
 </div>
 
 <!-- 图片预览弹窗 -->
 <div id="preview">
   <img id="preview-img" alt="人格卡片">
-  <div class="preview-tip">长按图片保存分享</div>
+  <div class="preview-tip">长按图片保存</div>
   <button class="close-preview" onclick="document.getElementById('preview').classList.remove('show')">关闭</button>
 </div>
 
@@ -299,17 +548,10 @@ const icons = {
 }
 
 const typeNames = {
-A: "SILENT ORDER",
-B: "DEEP WAVE", 
-C: "HIGH VOLTAGE",
-D: "VOID SIGNAL"
-}
-
-const typeColors = {
-A: "#3b82f6",
-B: "#8b5cf6",
-C: "#f59e0b",
-D: "#6366f1"
+A: "Silent Order",
+B: "Deep Wave", 
+C: "High Voltage",
+D: "Void Signal"
 }
 
 const questions = [
@@ -346,7 +588,7 @@ const questions = [
 const personas = [
 {n:"零度协议",d:"你的灵魂是一串被加密的精确指令。在混乱的世界里，你提供秩序。情感被压缩到最小，效率被放大到极致。你是系统中最可靠的内核，也是最孤独的存在。",t:"A"},
 {n:"静默核心",d:"你储存着所有关键数据，但拒绝任何外部访问。你是最安全的孤岛，也是最深的密码。人们以为他们了解你，但你只让他们看到你允许他们看到的那一层。",t:"A"},
-{n:"幽灵档案",d:"你记录一切，却不参与其中。像是坐在档案馆深处管理员，世界在你面前流淌，你只是默默归档。存在但不介入，这就是你的方式。",t:"A"},
+{n:"幽灵档案",d:"你记录一切，却不参与其中。像是坐在档案馆深处的管理员，世界在你面前流淌，你只是默默归档。存在但不介入，这就是你的方式。",t:"A"},
 {n:"光导神经",d:"你是纯粹的信息通道。冷硬、透明、高效。你不生产内容，只传递真相。情绪会干扰信号，所以你选择隔离。你是系统中最干净的管道。",t:"A"},
 {n:"精密校准仪",d:"你的人生是一场永无止境的修正。完美是一个不存在的渐近线，但你在每一个坐标点都试图更接近一点。你是最认真的优化器，也是最焦虑的完美主义者。",t:"A"},
 {n:"加密内核",d:"只有极少数人有权限访问你的真实代码。你用层层壳程序保护着最核心的那个自己。你相信，真正值得信任的人，会找到正确的密钥。",t:"A"},
@@ -376,14 +618,14 @@ const personas = [
 
 function render() {
   const q = questions[current]
-  document.getElementById('phase').innerText = `SIGNAL ${current+1}/${total}`
+  document.getElementById('progress-text').innerText = `${current+1}/${total}`
   document.getElementById('question').innerText = q.q
   document.getElementById('bar').style.width = ((current+1)/total*100) + '%'
   document.getElementById('options').innerHTML = `
-<button class="option" onclick="ans('A')">A. ${q.a}</button>
-<button class="option" onclick="ans('B')">B. ${q.b}</button>
-<button class="option" onclick="ans('C')">C. ${q.c}</button>
-<button class="option" onclick="ans('D')">D. ${q.d}</button>
+<button class="option" onclick="ans('A')"><span>A. ${q.a}</span></button>
+<button class="option" onclick="ans('B')"><span>B. ${q.b}</span></button>
+<button class="option" onclick="ans('C')"><span>C. ${q.c}</span></button>
+<button class="option" onclick="ans('D')"><span>D. ${q.d}</span></button>
   `
 }
 
@@ -402,14 +644,10 @@ function showResult() {
   const list = personas.filter(x=>x.t==top)
   const res = list[Math.floor(Math.random()*list.length)]
   
-  const color = typeColors[top]
-  document.getElementById('icon-wrap').style.background = `linear-gradient(135deg, ${color}33, ${color}11)`
-  document.getElementById('icon').innerHTML = `<path d="${icons[res.n]}" stroke="${color}"/>`
+  document.getElementById('icon').innerHTML = `<path d="${icons[res.n]}"/>`
   document.getElementById('type-tag').innerText = typeNames[top]
   document.getElementById('title').innerText = res.n
-  document.getElementById('title').style.color = color
   document.getElementById('desc').innerText = res.d
-  document.getElementById('desc').style.borderColor = color
   document.getElementById('result').classList.add('show')
 }
 
@@ -419,13 +657,12 @@ function start() {
 
 // 生成分享卡片
 async function generateCard() {
-  const result = document.getElementById('result')
-  const canvas = await html2canvas(result, {
-    backgroundColor: '#0a0a0a',
+  const resultContent = document.querySelector('.result-content')
+  const canvas = await html2canvas(resultContent, {
+    backgroundColor: '#fafafa',
     scale: 2,
     useCORS: true,
-    logging: false,
-    allowTaint: true
+    logging: false
   })
   const imgUrl = canvas.toDataURL('image/png')
   document.getElementById('preview-img').src = imgUrl
