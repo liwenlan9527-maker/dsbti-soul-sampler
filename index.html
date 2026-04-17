@@ -1472,13 +1472,15 @@
         }
 
         function calculateScores() {
-            const scores = [0, 0, 0, 0, 0];
+            const scores = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]; // 16个维度
             answers.forEach(answer => {
                 answer.forEach((score, i) => {
-                    scores[i] += score;
+                    if (i < 16) scores[i] += score;
                 });
             });
-            return scores.map(s => Math.round(s / answers.length * 20));
+            // 归一化到0-100分
+            const maxPossible = answers.length * 5;
+            return scores.map(s => Math.round(s / maxPossible * 100));
         }
 
         function getPrimaryType(scores) {
